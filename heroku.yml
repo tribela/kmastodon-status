@@ -3,4 +3,4 @@ build:
     web: Dockerfile
 
 run:
-  web: gunicorn app:app
+  web: uvicorn app:asgi --proxy-headers --host=${HOST:-0} --port=${PORT:-5000}

@@ -11,4 +11,4 @@ RUN \
 COPY . ./
 
 
-CMD ["gunicorn", "app:app", "--proxy-headers", "--host=0", "--port=5000"]
+CMD ["uvicorn", "app:asgi", "--proxy-headers", "--host=0", "--port=5000"]
