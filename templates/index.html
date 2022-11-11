@@ -17,7 +17,11 @@
           {% if status['alive'] %}
           <p class="data registrations">가입 가능 여부:
             {% if status['registrations'] %}
-              <span class="yes">가능✅</span>
+              {% if status['approval_required'] %}
+                <span class="approval">승인 필요✔️</span>
+              {% else %}
+                <span class="yes">가능✅</span>
+              {% endif %}
               <a href="https://{{ instance }}/about">들어가기</a>
             {% else %}
               <span class="no">불가능❌</span>

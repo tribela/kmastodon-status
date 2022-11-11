@@ -24,6 +24,7 @@ statuses = {
         'alive': False,
         'users': 0,
         'registrations': False,
+        'approval_required': False,
     }
     for instance in instances
 }
@@ -43,6 +44,7 @@ def update_status(force=False):
             data = httpx.get(f'https://{instance}/api/v1/instance').json()
             statuses[instance]['users'] = data['stats']['user_count']
             statuses[instance]['registrations'] = data['registrations']
+            statuses[instance]['approval_required'] = data['approval_required']
             statuses[instance]['alive'] = True
         except httpx.HTTPError:
             statuses[instance]['alive'] = False
@@ -57,7 +59,12 @@ def index():
 
     sorted_statuses = sorted(
         statuses.items(),
-        key=lambda x: (x[1]['registrations'], x[1]['alive'], -x[1]['users']),
+        key=lambda x: (
+            x[1]['alive'],
+            x[1]['registrations'],
+            not x[1]['approval_required'],
+            -x[1]['users']
+        ),
         reverse=True)
     return render_template('index.html', statuses=sorted_statuses)
 
