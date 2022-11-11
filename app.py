@@ -14,6 +14,9 @@ instances = {
     'social.silicon.moe',
     'kurry.social',
     'twingyeo.kr',
+    'bunbers.org',
+    'toot.funami.tech',
+    'mstdn.jbc.ne.kr',
 }
 
 statuses = {
