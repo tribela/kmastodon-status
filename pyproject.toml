@@ -10,7 +10,8 @@ packages = [{include = "kmastodon_status"}]
 python = "^3.10.0"
 Flask = "^2.2.2"
 httpx = "^0.23.0"
-gunicorn = "^20.1.0"
+asgiref = "^3.5.2"
+uvicorn = "^0.19.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"
