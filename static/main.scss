@@ -5,13 +5,24 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 main {
+  flex-grow: 1;
+
   h1 {
     text-align: center;
     font-size: 2rem;
   }
+}
+
+footer {
+  flex-grow: 0;
+  box-sizing: border-box;
+  padding: 1rem;
 }
 
 .instances {
