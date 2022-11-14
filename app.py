@@ -19,6 +19,7 @@ instances = {
     'toot.funami.tech',
     'mstdn.jbc.ne.kr',
     'uri.life',
+    'parfait.day',
 }
 
 statuses = {
