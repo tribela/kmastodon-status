@@ -1,6 +1,7 @@
 import datetime
 
 import httpx
+from multiprocessing.pool import ThreadPool
 
 from flask import Flask, render_template
 from asgiref.wsgi import WsgiToAsgi
@@ -38,19 +39,26 @@ def update_status(force=False):
     if (datetime.datetime.now() - last_updated).total_seconds() < 60 and force is False:
         return
 
+    pool = ThreadPool(10)
+
+    pool.map(update_status_for_instance, instances)
     last_updated = datetime.datetime.now()
-    for instance in instances:
-        print(instance)
-        try:
-            data = httpx.get(f'https://{instance}/api/v1/instance').json()
-            statuses[instance]['users'] = data['stats']['user_count']
-            statuses[instance]['registrations'] = data['registrations']
-            statuses[instance]['approval_required'] = data['approval_required']
-            statuses[instance]['alive'] = True
-        except httpx.HTTPError:
-            statuses[instance]['alive'] = False
-        except Exception:
-            statuses[instance]['alive'] = False
+
+
+def update_status_for_instance(instance: str):
+    global statuses
+
+    print(instance)
+    try:
+        data = httpx.get(f'https://{instance}/api/v1/instance').json()
+        statuses[instance]['users'] = data['stats']['user_count']
+        statuses[instance]['registrations'] = data['registrations']
+        statuses[instance]['approval_required'] = data['approval_required']
+        statuses[instance]['alive'] = True
+    except httpx.HTTPError:
+        statuses[instance]['alive'] = False
+    except Exception:
+        statuses[instance]['alive'] = False
 
 
 @app.route('/')
