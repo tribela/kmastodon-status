@@ -29,6 +29,19 @@ main {
     border: 1px solid #d9e1e8;
     border-radius: 5px;
 
+    &.dead,
+    &.closed {
+      background: #df405a55;
+    }
+
+    &.approval {
+      background: #ca8f0455;
+    }
+
+    &.open {
+      background: #79bd9a55;
+    }
+
     .name {
       font-size: 2rem;
       font-weight: bold;
@@ -36,6 +49,7 @@ main {
 
     a {
       color: #6364ff;
+      text-shadow: 0 0 1px black;
       text-decoration: none;
       font-weight: bold;
       margin-top: 1rem;

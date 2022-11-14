@@ -12,7 +12,17 @@
       <h1>한국 마스토돈 서버 가입 현황</h1>
       <div class="instances">
         {% for instance, status in statuses %}
-          <div class="instance">
+        {% if not status['alive'] %}
+        {% set status_class = 'dead' %}
+        {% elif not status['registrations'] %}
+        {% set status_class = 'closed' %}
+        {% elif status['approval_required'] %}
+        {% set status_class = 'approval' %}
+        {% else %}
+        {% set status_class = 'open' %}
+        {% endif %}
+
+        <div class="instance {{ status_class }}">
             <div class="name">{{ instance }}</div>
 
             {% if status['alive'] %}

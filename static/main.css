@@ -4,5 +4,8 @@ main h1 { text-align: center; font-size: 2rem; }
 
 .instances { max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); grid-gap: 1rem; }
 .instances .instance { display: inline-block; box-sizing: border-box; padding: 1rem; text-align: center; border: 1px solid #d9e1e8; border-radius: 5px; }
+.instances .instance.dead, .instances .instance.closed { background: #df405a55; }
+.instances .instance.approval { background: #ca8f0455; }
+.instances .instance.open { background: #79bd9a55; }
 .instances .instance .name { font-size: 2rem; font-weight: bold; }
-.instances .instance a { color: #6364ff; text-decoration: none; font-weight: bold; margin-top: 1rem; }
+.instances .instance a { color: #6364ff; text-shadow: 0 0 1px black; text-decoration: none; font-weight: bold; margin-top: 1rem; }
