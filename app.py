@@ -17,6 +17,7 @@ instances = {
     'bunbers.org',
     'toot.funami.tech',
     'mstdn.jbc.ne.kr',
+    'uri.life',
 }
 
 statuses = {
