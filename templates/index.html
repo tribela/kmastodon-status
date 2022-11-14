@@ -10,29 +10,31 @@
   <body>
     <main>
       <h1>한국 마스토돈 서버 가입 현황</h1>
-      {% for instance, status in statuses %}
-        <div>
-          <div class="name">{{ instance }}</div>
+      <div class="instances">
+        {% for instance, status in statuses %}
+          <div class="instance">
+            <div class="name">{{ instance }}</div>
 
-          {% if status['alive'] %}
-          <p class="data registrations">가입 가능 여부:
-            {% if status['registrations'] %}
-              {% if status['approval_required'] %}
-                <span class="approval">승인 필요✔️</span>
+            {% if status['alive'] %}
+            <p class="data registrations">
+              {% if status['registrations'] %}
+                {% if status['approval_required'] %}
+                  <p class="approval">승인 필요✔️</p>
+                {% else %}
+                  <p class="yes">가입 가능✅</p>
+                {% endif %}
+                <a href="https://{{ instance }}/about">들어가기</a>
               {% else %}
-                <span class="yes">가능✅</span>
+                <p class="no">가입 불가능❌</p>
+                <a href="https://{{ instance }}/about">살펴보기</a>
               {% endif %}
-              <a href="https://{{ instance }}/about">들어가기</a>
+            {# <p class="data users">사용자 수: {{ status['users'] }}</p> #}
             {% else %}
-              <span class="no">불가능❌</span>
-              <a href="https://{{ instance }}/about">살펴보기</a>
+            <p>서버 상태 확인 불가</p>
             {% endif %}
-          {# <p class="data users">사용자 수: {{ status['users'] }}</p> #}
-          {% else %}
-          <p>서버 상태 확인 불가</p>
-          {% endif %}
-        </div>
-      {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
     </main>
   </body>
 </html>

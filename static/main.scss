@@ -8,15 +8,37 @@ html, body {
 }
 
 main {
-  .name {
+  h1 {
+    text-align: center;
     font-size: 2rem;
-    font-weight: bold;
   }
+}
 
-  a {
-    color: #6364ff;
-    text-decoration: none;
-    font-weight: bold;
-    margin-top: 1rem;
+.instances {
+
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 1rem;
+
+  .instance {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid #d9e1e8;
+    border-radius: 5px;
+
+    .name {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    a {
+      color: #6364ff;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
   }
 }
