@@ -11,4 +11,5 @@ footer { flex-grow: 0; box-sizing: border-box; padding: 1rem; }
 .instances .instance.approval { background: #ca8f0455; }
 .instances .instance.open { background: #79bd9a55; }
 .instances .instance .name { font-size: 2rem; font-weight: bold; }
+.instances .instance .software { font-weight: bold; }
 .instances .instance a { color: #6364ff; text-shadow: 0 0 1px black; text-decoration: none; font-weight: bold; margin-top: 1rem; }

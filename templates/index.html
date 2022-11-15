@@ -12,42 +12,48 @@
       <h1>한국 마스토돈 서버 가입 현황</h1>
       <div class="instances">
         {% for instance, status in statuses %}
-        {% if not status['alive'] %}
-        {% set status_class = 'dead' %}
-        {% elif not status['registrations'] %}
-        {% set status_class = 'closed' %}
-        {% elif status['approval_required'] %}
-        {% set status_class = 'approval' %}
-        {% else %}
-        {% set status_class = 'open' %}
-        {% endif %}
+          {% if not status['alive'] %}
+            {% set status_class = 'dead' %}
+          {% elif not status['registrations'] %}
+            {% set status_class = 'closed' %}
+          {% elif status['approval_required'] %}
+            {% set status_class = 'approval' %}
+          {% else %}
+            {% set status_class = 'open' %}
+          {% endif %}
 
-        <div class="instance {{ status_class }}">
+          <div class="instance {{ status_class }}">
             <div class="name">{{ instance }}</div>
 
             {% if status['alive'] %}
-            <p class="data registrations">
-              {% if status['registrations'] %}
-                {% if status['approval_required'] %}
-                  <p class="approval">승인 필요✔️</p>
-                {% else %}
-                  <p class="yes">가입 가능✅</p>
+              <p class="software">
+                {{ status['software'] }}
+                {% if status['version'] %}
+                  {{ status['version'] }}
                 {% endif %}
-                <a href="https://{{ instance }}/about">들어가기</a>
+              </p>
+              <p class="data registrations">
+                {% if status['registrations'] %}
+                  {% if status['approval_required'] %}
+                    <p class="approval">승인 필요✔️</p>
+                  {% else %}
+                    <p class="yes">가입 가능✅</p>
+                  {% endif %}
+                  <a href="https://{{ instance }}/about">들어가기</a>
+                {% else %}
+                  <p class="no">가입 불가능❌</p>
+                  <a href="https://{{ instance }}/about">살펴보기</a>
+                {% endif %}
+                {# <p class="data users">사용자 수: {{ status['users'] }}</p> #}
               {% else %}
-                <p class="no">가입 불가능❌</p>
-                <a href="https://{{ instance }}/about">살펴보기</a>
+                <p>서버 상태 확인 불가</p>
               {% endif %}
-            {# <p class="data users">사용자 수: {{ status['users'] }}</p> #}
-            {% else %}
-            <p>서버 상태 확인 불가</p>
-            {% endif %}
           </div>
         {% endfor %}
       </div>
     </main>
     <footer>
-        <p> Made by @jarm&#64;qdon.space </p>
+      <p> Made by @jarm&#64;qdon.space </p>
     </footer>
   </body>
 </html>

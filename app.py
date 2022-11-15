@@ -20,10 +20,15 @@ instances = {
     'mstdn.jbc.ne.kr',
     'uri.life',
     'parfait.day',
+    'madost.one',
+    'stella.place',
+    'k.lapy.link',
 }
 
 statuses = {
     instance: {
+        'software': '',
+        'version': '',
         'alive': False,
         'users': 0,
         'registrations': False,
@@ -33,6 +38,20 @@ statuses = {
 }
 
 last_updated = datetime.datetime.now()
+
+
+def get_software(instance: str) -> (str, str):
+    try:
+        data = httpx.get(f'https://{instance}/.well-known/nodeinfo').json()
+        nodeinfo_url = data['links'][0]['href']
+
+        nodeinfo = httpx.get(nodeinfo_url).json()
+
+        return (nodeinfo['software']['name'], nodeinfo['software']['version'])
+    except httpx.HTTPError:
+        return None
+    except Exception:
+        return None
 
 
 def update_status(force=False):
@@ -50,12 +69,28 @@ def update_status_for_instance(instance: str):
     global statuses
 
     print(instance)
+
     try:
-        data = httpx.get(f'https://{instance}/api/v1/instance').json()
-        statuses[instance]['users'] = data['stats']['user_count']
-        statuses[instance]['registrations'] = data['registrations']
-        statuses[instance]['approval_required'] = data['approval_required']
+        software, version = get_software(instance)
+        statuses[instance]['software'] = software
+        statuses[instance]['version'] = version
         statuses[instance]['alive'] = True
+
+        if software in ('mastodon', 'pleroma', 'akkoma'):
+            data = httpx.get(f'https://{instance}/api/v1/instance').json()
+
+            statuses[instance]['users'] = data['stats']['user_count']
+            statuses[instance]['registrations'] = data['registrations']
+            statuses[instance]['approval_required'] = data['approval_required']
+        elif software == 'misskey':
+            data = httpx.get(f'https://{instance}/nodeinfo/2.0').json()
+
+            statuses[instance]['users'] = data['usage']['users']['total']
+            statuses[instance]['registrations'] = data['openRegistrations']
+            statuses[instance]['approval_required'] = False
+        else:
+            statuses[instance]['alive'] = False
+
     except httpx.HTTPError:
         statuses[instance]['alive'] = False
     except Exception:
