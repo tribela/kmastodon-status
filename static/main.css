@@ -5,7 +5,7 @@ main h1 { text-align: center; font-size: 2rem; }
 
 footer { flex-grow: 0; box-sizing: border-box; padding: 1rem; }
 
-.instances { max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); grid-gap: 1rem; }
+.instances { max-width: min(1200px, 100vw); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); grid-gap: 1rem; }
 .instances .instance { display: inline-block; box-sizing: border-box; padding: 1rem; text-align: center; border: 1px solid #d9e1e8; border-radius: 5px; }
 .instances .instance.dead, .instances .instance.closed { background: #df405a55; }
 .instances .instance.approval { background: #ca8f0455; }
