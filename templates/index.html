@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>한국 마스토돈 서버 가입 현황</title>
+    <title>한국 연합우주 서버 가입 현황</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
   </head>
   <body>
     <main>
-      <h1>한국 마스토돈 서버 가입 현황</h1>
+      <h1>한국 연합우주 서버 가입 현황</h1>
       <div class="instances">
         {% for instance, status in statuses %}
           {% if not status['alive'] %}

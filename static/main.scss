@@ -42,15 +42,15 @@ footer {
 
     &.dead,
     &.closed {
-      background: #df405a55;
+      background: #df405a44;
     }
 
     &.approval {
-      background: #ca8f0455;
+      background: #ca8f0444;
     }
 
     &.open {
-      background: #79bd9a55;
+      background: #79bd9a44;
     }
 
     .name {
@@ -68,6 +68,10 @@ footer {
       text-decoration: none;
       font-weight: bold;
       margin-top: 1rem;
+      padding: .5em;
+      background: #282c37dd;
+      border-radius: 5px;
+      border: 1px solid #6364ff;
     }
   }
 }
