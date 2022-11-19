@@ -19,7 +19,6 @@ instances = {
     'toot.funami.tech',
     'mstdn.jbc.ne.kr',
     'uri.life',
-    'parfait.day',
     'madost.one',
     'stella.place',
     'k.lapy.link',
