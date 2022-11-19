@@ -81,8 +81,10 @@ def update_status_for_instance(instance: str):
             statuses[instance]['users'] = data['stats']['user_count']
             statuses[instance]['registrations'] = data['registrations']
             statuses[instance]['approval_required'] = data['approval_required']
-        elif software == 'misskey':
+        elif software in ('misskey', 'castella'):
             data = httpx.get(f'https://{instance}/nodeinfo/2.0').json()
+
+            statuses[instance]['software'] = 'misskey'
 
             statuses[instance]['users'] = data['usage']['users']['total']
             statuses[instance]['registrations'] = data['openRegistrations']
