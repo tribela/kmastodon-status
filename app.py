@@ -22,6 +22,7 @@ instances = {
     'madost.one',
     'stella.place',
     'k.lapy.link',
+    'constellati.one',
 }
 
 statuses = {
@@ -39,7 +40,7 @@ statuses = {
 last_updated = datetime.datetime.now()
 
 
-def get_software(instance: str) -> (str, str):
+def get_software(instance: str) -> tuple[str, str]:
     try:
         data = httpx.get(f'https://{instance}/.well-known/nodeinfo').json()
         nodeinfo_url = data['links'][0]['href']
