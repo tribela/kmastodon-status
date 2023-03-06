@@ -3,7 +3,7 @@ import datetime
 import math
 
 import httpx
-from multiprocessing.pool import ThreadPool
+
 from packaging import version
 
 from flask import Flask, render_template
