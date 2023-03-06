@@ -1,4 +1,6 @@
+import asyncio
 import datetime
+import math
 
 import httpx
 from multiprocessing.pool import ThreadPool
@@ -38,6 +40,7 @@ statuses = {
         'software': '',
         'version': '',
         'alive': False,
+        'response_time': float('inf'),
         'logins': 0,
         'registrations': 0,
         'statuses': 0,
@@ -64,43 +67,69 @@ def get_software(instance: str) -> tuple[str, str]:
         return None
 
 
-def update_status(force=False):
+async def update_status(force=False):
     global last_updated
-    if (datetime.datetime.now() - last_updated).total_seconds() < 60 and force is False:
+    if (datetime.datetime.now() - last_updated).total_seconds() < 10 and force is False:
+        print('Not updating')
         return
 
-    pool = ThreadPool(10)
-
-    pool.map(update_status_for_instance, instances)
     last_updated = datetime.datetime.now()
 
+    await asyncio.gather(*[
+        update_status_for_instance(instance)
+        for instance in instances
+    ])
 
-def update_status_for_instance(instance: str):
+
+async def update_status_for_instance(instance: str):
     global statuses
 
     print(instance)
 
     try:
-        software, version = get_software(instance)
-        statuses[instance]['software'] = software
-        statuses[instance]['version'] = version
+        async with httpx.AsyncClient() as client:
+            [
+                res_health,
+                res_activity,
+                res_instance,
+            ] = await asyncio.gather(
+                    *[client.get(url) for url in [
+                        f'https://{instance}/health',
+                        f'https://{instance}/api/v1/instance/activity',
+                        f'https://{instance}/api/v1/instance',
+                    ]]
+                )
+
+        if res_health.status_code != 200:
+            statuses[instance]['alive'] = False
+            return
+
+        instance_data = res_instance.json()
+        activity_data = res_activity.json()[1]
+
+        statuses[instance]['software'] = 'mastodon'
+        statuses[instance]['version'] = instance_data['version']
         statuses[instance]['alive'] = True
 
-        data = httpx.get(f'https://{instance}/api/v1/instance').json()
+        statuses[instance]['name'] = instance_data['title']
+        statuses[instance]['open_registrations'] = instance_data['registrations']
+        statuses[instance]['approval_required'] = instance_data['approval_required']
 
-        statuses[instance]['name'] = data['title']
-        statuses[instance]['open_registrations'] = data['registrations']
-        statuses[instance]['approval_required'] = data['approval_required']
+        statuses[instance]['logins'] = int(activity_data['logins'])
+        statuses[instance]['registrations'] = int(activity_data['registrations'])
+        statuses[instance]['statuses'] = int(activity_data['statuses'])
 
-        statistics = httpx.get(f'https://{instance}/api/v1/instance/activity').json()[1]
-
-        statuses[instance]['logins'] = int(statistics['logins'])
-        statuses[instance]['registrations'] = int(statistics['registrations'])
-        statuses[instance]['statuses'] = int(statistics['statuses'])
+        # Moving average
+        if statuses[instance]['response_time'] == float('inf'):
+            statuses[instance]['response_time'] = res_health.elapsed.total_seconds()
+        else:
+            statuses[instance]['response_time'] = (
+                statuses[instance]['response_time'] * 0.9
+                + res_health.elapsed.total_seconds() * 0.1
+            )
 
     except httpx.HTTPError:
-        statuses[instance]['alive'] = False
-    except Exception:
+        print("HTTP Error")
         statuses[instance]['alive'] = False
 
 
@@ -110,28 +139,43 @@ def parse_version(ver: str) -> version.Version:
     try:
         return version.parse(ver)
     except ValueError:
-        return (0, 0, 0)
+        version.Version('0.0.0')
 
 
 @app.route('/')
-def index():
-    update_status()
+async def index():
+    await update_status()
     # render statuses with template
+
+    def score_function(item):
+        status = item[1]
+        alive = status['alive']
+        ver = parse_version(status['version'])
+        open_registrations = status['open_registrations']
+        approval_required = status['approval_required']
+        score = (
+            math.log2(status['logins'] + 1)
+            + math.log2(status['statuses'] + 1)
+            + math.log2(status['registrations'] + 1) * 0.1
+            - status['response_time'] * 10
+        )
+
+        instance = item[0]
+        print(f'{instance}: {score}')
+
+        return (
+            alive,
+            score,
+            ver,
+            open_registrations,
+            not approval_required)
 
     sorted_statuses = sorted(
         statuses.items(),
-        key=lambda x: (
-            x[1]['alive'],
-            x[1]['logins'],
-            x[1]['statuses'],
-            x[1]['registrations'],
-            parse_version(x[1]['version']),
-            x[1]['open_registrations'],
-            not x[1]['approval_required'],
-        ),
+        key=score_function,
         reverse=True)
     return render_template('index.html', statuses=sorted_statuses)
 
 
-update_status(force=True)
+asyncio.run(update_status(force=True))
 asgi = WsgiToAsgi(app)

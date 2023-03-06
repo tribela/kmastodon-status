@@ -63,10 +63,15 @@ footer {
       text-align: left;
     }
 
+    .time,
     .statuses,
     .logins,
     .registrations {
       text-align: right;
+    }
+
+    .time {
+      font-variant-numeric: lining-nums;
     }
 
     a {

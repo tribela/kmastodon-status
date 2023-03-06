@@ -16,6 +16,7 @@
             <th>이름</th>
             {# <th>소프트웨어</th> #}
             <th>버전</th>
+            <th>응답시간</th>
             <th>주간 게시물</th>
             <th>주간 로그인</th>
             <th>주간 가입</th>
@@ -41,6 +42,7 @@
             </td>
             {# <td class="software">{{ status['software'] }}</td> #}
             <td class="version">{{ status['version'] }}</td>
+            <td class="time">{{ '%0.3f s' | format(status['response_time']|float) }}</td>
             <td class="statuses">{{ status['statuses'] }}</td>
             <td class="logins">{{ status['logins'] }}</td>
             <td class="registrations">{{ status['registrations'] }}</td>

@@ -13,5 +13,6 @@ footer { flex-grow: 0; box-sizing: border-box; padding: 1rem; }
 .instances .instance td { padding: .5em; }
 .instances .instance .name .title { font-size: 1.2em; font-weight: bold; }
 .instances .instance .version { text-align: left; }
-.instances .instance .statuses, .instances .instance .logins, .instances .instance .registrations { text-align: right; }
+.instances .instance .time, .instances .instance .statuses, .instances .instance .logins, .instances .instance .registrations { text-align: right; }
+.instances .instance .time { font-variant-numeric: lining-nums; }
 .instances .instance a { color: orange; text-shadow: 0 0 1px black; text-decoration: none; font-weight: bold; }
