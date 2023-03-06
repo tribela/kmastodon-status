@@ -177,5 +177,5 @@ async def index():
     return render_template('index.html', statuses=sorted_statuses)
 
 
-asyncio.run(update_status(force=True))
+asyncio.ensure_future(update_status(force=True))
 asgi = WsgiToAsgi(app)
