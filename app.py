@@ -124,8 +124,8 @@ async def update_status_for_instance(instance: str):
             statuses[instance]['response_time'] = res_health.elapsed.total_seconds()
         else:
             statuses[instance]['response_time'] = (
-                statuses[instance]['response_time'] * 0.9
-                + res_health.elapsed.total_seconds() * 0.1
+                statuses[instance]['response_time'] * 0.5
+                + res_health.elapsed.total_seconds() * 0.5
             )
 
     except httpx.HTTPError:
@@ -157,7 +157,7 @@ async def index():
             math.log2(status['logins'] + 1)
             + math.log2(status['statuses'] + 1)
             + math.log2(status['registrations'] + 1) * 0.1
-            - status['response_time'] * 10
+            - status['response_time'] * 5
         )
 
         instance = item[0]
