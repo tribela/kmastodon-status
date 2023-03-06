@@ -12,6 +12,7 @@ Flask = "^2.2.2"
 httpx = "^0.23.0"
 asgiref = "^3.5.2"
 uvicorn = "^0.19.0"
+packaging = "^23.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"

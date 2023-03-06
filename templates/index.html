@@ -9,12 +9,24 @@
   </head>
   <body>
     <main>
-      <h1>한국 연합우주 서버 가입 현황</h1>
-      <div class="instances">
+      <h1>한국 연합우주 서버 현황</h1>
+      <table class="instances">
+        <thead>
+          <tr>
+            <th>이름</th>
+            {# <th>소프트웨어</th> #}
+            <th>버전</th>
+            <th>주간 게시물</th>
+            <th>주간 로그인</th>
+            <th>주간 가입</th>
+            <th>가입</th>
+          </tr>
+        </thead>
+        <tbody>
         {% for instance, status in statuses %}
           {% if not status['alive'] %}
             {% set status_class = 'dead' %}
-          {% elif not status['registrations'] %}
+          {% elif not status['open_registrations'] %}
             {% set status_class = 'closed' %}
           {% elif status['approval_required'] %}
             {% set status_class = 'approval' %}
@@ -22,35 +34,34 @@
             {% set status_class = 'open' %}
           {% endif %}
 
-          <div class="instance {{ status_class }}">
-            <div class="name">{{ instance }}</div>
-
-            {% if status['alive'] %}
-              <p class="software">
-                {{ status['software'] }}
-                {% if status['version'] %}
-                  {{ status['version'] }}
-                {% endif %}
-              </p>
-              <p class="data registrations">
-                {% if status['registrations'] %}
+          <tr class="instance {{ status_class }}">
+            <td class="name">
+              <span class="title">{{ status['name'] }}</span>
+              <br/><a href="https://{{instance}}/">{{ instance }}</a>
+            </td>
+            {# <td class="software">{{ status['software'] }}</td> #}
+            <td class="version">{{ status['version'] }}</td>
+            <td class="statuses">{{ status['statuses'] }}</td>
+            <td class="logins">{{ status['logins'] }}</td>
+            <td class="registrations">{{ status['registrations'] }}</td>
+            <td class="registration">
+              {% if status['alive'] %}
+                {% if status['open_registrations'] %}
                   {% if status['approval_required'] %}
-                    <p class="approval">승인 필요✔️</p>
+              <p class="approval">승인 필요✔️</p>
                   {% else %}
-                    <p class="yes">가입 가능✅</p>
+              <p class="yes">가입 가능✅</p>
                   {% endif %}
-                  <a href="https://{{ instance }}/about">들어가기</a>
                 {% else %}
-                  <p class="no">가입 불가능❌</p>
-                  <a href="https://{{ instance }}/about">살펴보기</a>
+              <p class="no">가입 불가능❌</p>
                 {% endif %}
-                {# <p class="data users">사용자 수: {{ status['users'] }}</p> #}
               {% else %}
-                <p>서버 상태 확인 불가</p>
+              <p>확인 불가</p>
               {% endif %}
-          </div>
+          </tr>
         {% endfor %}
-      </div>
+        </tbody>
+      </table>
     </main>
     <footer>
       <p> Made by @jarm&#64;qdon.space </p>

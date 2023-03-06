@@ -2,6 +2,7 @@ import datetime
 
 import httpx
 from multiprocessing.pool import ThreadPool
+from packaging import version
 
 from flask import Flask, render_template
 from asgiref.wsgi import WsgiToAsgi
@@ -11,27 +12,36 @@ app = Flask(__name__)
 instances = {
     'qdon.space',
     'planet.moe',
-    'ani.work',
-    'social.silicon.moe',
-    'kurry.social',
     'twingyeo.kr',
-    'bunbers.org',
-    'toot.funami.tech',
-    'mstdn.jbc.ne.kr',
+    'kurry.social',
+    'jmm.kr',
+    'ani.work',
+    'occm.cc',
+    'parfait.day',
+    'furpark.kr',
     'uri.life',
-    'madost.one',
-    'stella.place',
-    'k.lapy.link',
-    'constellati.one',
+    'duk.space',
+    'maratang.life',
+    'mastodon.mnetwork.co.kr',
+    'bakedbean.xyz',
+    'renkontu.com',
+    'mustard.blog',
+    'social.silicon.moe',
+    'toot.funami.tech',
+    't.chadole.com',
+    'mastodon.simpreative.network',
 }
 
 statuses = {
     instance: {
+        'name': '',
         'software': '',
         'version': '',
         'alive': False,
-        'users': 0,
-        'registrations': False,
+        'logins': 0,
+        'registrations': 0,
+        'statuses': 0,
+        'open_registrations': False,
         'approval_required': False,
     }
     for instance in instances
@@ -76,27 +86,31 @@ def update_status_for_instance(instance: str):
         statuses[instance]['version'] = version
         statuses[instance]['alive'] = True
 
-        if software in ('mastodon', 'pleroma', 'akkoma'):
-            data = httpx.get(f'https://{instance}/api/v1/instance').json()
+        data = httpx.get(f'https://{instance}/api/v1/instance').json()
 
-            statuses[instance]['users'] = data['stats']['user_count']
-            statuses[instance]['registrations'] = data['registrations']
-            statuses[instance]['approval_required'] = data['approval_required']
-        elif software in ('misskey', 'castella'):
-            data = httpx.get(f'https://{instance}/nodeinfo/2.0').json()
+        statuses[instance]['name'] = data['title']
+        statuses[instance]['open_registrations'] = data['registrations']
+        statuses[instance]['approval_required'] = data['approval_required']
 
-            statuses[instance]['software'] = 'misskey'
+        statistics = httpx.get(f'https://{instance}/api/v1/instance/activity').json()[1]
 
-            statuses[instance]['users'] = data['usage']['users']['total']
-            statuses[instance]['registrations'] = data['openRegistrations']
-            statuses[instance]['approval_required'] = False
-        else:
-            statuses[instance]['alive'] = False
+        statuses[instance]['logins'] = int(statistics['logins'])
+        statuses[instance]['registrations'] = int(statistics['registrations'])
+        statuses[instance]['statuses'] = int(statistics['statuses'])
 
     except httpx.HTTPError:
         statuses[instance]['alive'] = False
     except Exception:
         statuses[instance]['alive'] = False
+
+
+def parse_version(ver: str) -> version.Version:
+    # Get rid of postfixes
+    ver = ver.split('+')[0]
+    try:
+        return version.parse(ver)
+    except ValueError:
+        return (0, 0, 0)
 
 
 @app.route('/')
@@ -108,9 +122,12 @@ def index():
         statuses.items(),
         key=lambda x: (
             x[1]['alive'],
+            x[1]['logins'],
+            x[1]['statuses'],
             x[1]['registrations'],
+            parse_version(x[1]['version']),
+            x[1]['open_registrations'],
             not x[1]['approval_required'],
-            -x[1]['users']
         ),
         reverse=True)
     return render_template('index.html', statuses=sorted_statuses)
