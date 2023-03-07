@@ -17,4 +17,15 @@ footer { flex-grow: 0; box-sizing: border-box; padding: 1rem; }
 .instances .instance .time { font-variant-numeric: tabular-nums; }
 .instances .instance a { color: orange; text-shadow: 0 0 1px black; text-decoration: none; font-weight: bold; }
 
+@media only screen and (max-width: 760px) { table.instances, table.instances thead, table.instances tbody, table.instances th, table.instances td, table.instances tr { display: block; }
+  table.instances thead tr { position: absolute; top: -9999px; left: -9999px; }
+  table.instances tr.instance { margin: 0 0 1rem 0; }
+  table.instances tr.instance td { border: none; border-bottom: 1px solid #eee; position: relative; }
+  table.instances tr.instance td:not(.name):not(.registration) { padding-left: 50%; text-align: right; }
+  table.instances tr.instance td:before { position: absolute; left: 1em; width: 45%; padding-right: 1em; white-space: nowrap; text-align: left; }
+  table.instances tr.instance td:nth-of-type(2):before { content: 'Version'; }
+  table.instances tr.instance td:nth-of-type(3):before { content: 'Response time'; }
+  table.instances tr.instance td:nth-of-type(4):before { content: 'Weekly statuses'; }
+  table.instances tr.instance td:nth-of-type(5):before { content: 'Weekly logins'; }
+  table.instances tr.instance td:nth-of-type(6):before { content: 'Weekly registrations'; } }
 .invisible { display: none; }
