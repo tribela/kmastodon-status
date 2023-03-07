@@ -9,6 +9,9 @@ from packaging import version
 from flask import Flask, render_template
 from asgiref.wsgi import WsgiToAsgi
 
+
+UPDATE_INTERVAL = 60
+
 app = Flask(__name__)
 
 instances = {
@@ -69,7 +72,8 @@ def get_software(instance: str) -> tuple[str, str]:
 
 async def update_status(force=False):
     global last_updated
-    if (datetime.datetime.now() - last_updated).total_seconds() < 10 and force is False:
+    elapsed = (datetime.datetime.now() - last_updated).total_seconds()
+    if elapsed < UPDATE_INTERVAL and force is False:
         print('Not updating')
         return
 
@@ -144,9 +148,6 @@ def parse_version(ver: str) -> version.Version:
 
 @app.route('/')
 async def index():
-    await update_status()
-    # render statuses with template
-
     def score_function(item):
         status = item[1]
         alive = status['alive']
@@ -177,5 +178,12 @@ async def index():
     return render_template('index.html', statuses=sorted_statuses)
 
 
-asyncio.ensure_future(update_status(force=True))
+async def worker():
+    await update_status(force=True)
+    while True:
+        await asyncio.sleep(UPDATE_INTERVAL)
+        await update_status()
+
+
+asyncio.ensure_future(worker())
 asgi = WsgiToAsgi(app)
