@@ -4,10 +4,9 @@ import math
 
 import httpx
 
-from packaging import version
-
-from flask import Flask, render_template
 from asgiref.wsgi import WsgiToAsgi
+from flask import Flask, render_template
+from packaging import version
 
 
 UPDATE_INTERVAL = 60
