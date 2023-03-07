@@ -9,7 +9,7 @@ from flask import Flask, render_template
 from packaging import version
 
 
-UPDATE_INTERVAL = 60
+UPDATE_INTERVAL = 60 * 5
 
 app = Flask(__name__)
 
@@ -73,7 +73,6 @@ async def update_status(force=False):
     global last_updated
     elapsed = (datetime.datetime.now() - last_updated).total_seconds()
     if elapsed < UPDATE_INTERVAL and force is False:
-        print('Not updating')
         return
 
     last_updated = datetime.datetime.now()
@@ -86,8 +85,6 @@ async def update_status(force=False):
 
 async def update_status_for_instance(instance: str):
     global statuses
-
-    print(instance)
 
     try:
         async with httpx.AsyncClient() as client:
@@ -132,7 +129,6 @@ async def update_status_for_instance(instance: str):
             )
 
     except httpx.HTTPError:
-        print("HTTP Error")
         statuses[instance]['alive'] = False
 
 
@@ -159,9 +155,6 @@ async def index():
             + math.log2(status['registrations'] + 1) * 0.1
             - status['response_time'] * 5
         )
-
-        instance = item[0]
-        print(f'{instance}: {score}')
 
         return (
             alive,
