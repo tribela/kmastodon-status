@@ -48,6 +48,7 @@ statuses = {
         'statuses': 0,
         'open_registrations': False,
         'approval_required': False,
+        'score': 0,
     }
     for instance in instances
 }
@@ -131,6 +132,8 @@ async def update_status_for_instance(instance: str):
     except httpx.HTTPError:
         statuses[instance]['alive'] = False
 
+    statuses[instance]['score'] = score_function(statuses[instance])
+
 
 def parse_version(ver: str) -> version.Version:
     # Get rid of postfixes
@@ -141,20 +144,24 @@ def parse_version(ver: str) -> version.Version:
         version.Version('0.0.0')
 
 
+def score_function(status):
+    return (
+        math.log2(status['logins'] + 1)
+        + math.log2(status['statuses'] + 1)
+        + math.log2(status['registrations'] + 1) * 0.1
+        - math.log2(status['response_time']) * 0.5
+    )
+
+
 @app.route('/')
 async def index():
-    def score_function(item):
+    def sort_function(item):
         status = item[1]
         alive = status['alive']
         ver = parse_version(status['version'])
         open_registrations = status['open_registrations']
         approval_required = status['approval_required']
-        score = (
-            math.log2(status['logins'] + 1)
-            + math.log2(status['statuses'] + 1)
-            + math.log2(status['registrations'] + 1) * 0.1
-            - status['response_time'] * 5
-        )
+        score = status['score']
 
         return (
             alive,
@@ -165,7 +172,7 @@ async def index():
 
     sorted_statuses = sorted(
         statuses.items(),
-        key=score_function,
+        key=sort_function,
         reverse=True)
     return render_template('index.html', statuses=sorted_statuses)
 
