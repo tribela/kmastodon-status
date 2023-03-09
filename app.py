@@ -131,6 +131,9 @@ async def update_status_for_instance(instance: str):
 
     except httpx.HTTPError:
         statuses[instance]['alive'] = False
+    except Exception as e:
+        print(f'Error on updating {instance}: {e}')
+        statuses[instance]['alive'] = False
 
     statuses[instance]['score'] = score_function(statuses[instance])
 
