@@ -1,15 +1,21 @@
 import asyncio
 import datetime
 import math
+import threading
+import time
+
+from urllib import request
 
 import httpx
+import schedule
 
 from asgiref.wsgi import WsgiToAsgi
 from flask import Flask, render_template
 from packaging import version
 
 
-UPDATE_INTERVAL = 60 * 5
+UPDATE_INTERVAL = 60 * 30
+TTFB_INTERVAL = 60 * 5
 
 app = Flask(__name__)
 
@@ -70,6 +76,24 @@ def get_software(instance: str) -> tuple[str, str]:
         return None
 
 
+def get_response_time(url: str) -> float:
+    req = request.Request(
+        url,
+        headers={
+            'User-Agent': '',
+        }
+    )
+    start_time = time.monotonic()
+    try:
+        with request.urlopen(req) as res:
+            res.read(1)
+    except:
+        return float('inf')
+    else:
+        end_time = time.monotonic()
+        return end_time - start_time
+
+
 async def update_status(force=False):
     global last_updated
     elapsed = (datetime.datetime.now() - last_updated).total_seconds()
@@ -82,6 +106,33 @@ async def update_status(force=False):
         update_status_for_instance(instance)
         for instance in instances
     ])
+
+
+def update_response_time(instance: str):
+    global statuses
+
+    try:
+        response_time = get_response_time(f'https://{instance}/health')
+
+        # Moving average
+        if statuses[instance]['response_time'] == float('inf'):
+            statuses[instance]['response_time'] = response_time
+        else:
+            statuses[instance]['response_time'] = (
+                statuses[instance]['response_time'] * 0.5
+                + response_time * 0.5
+            )
+    except:
+        statuses[instance]['alive'] = False
+    else:
+        statuses[instance]['alive'] = True
+    finally:
+        statuses[instance]['score'] = score_function(statuses[instance])
+
+
+def update_response_times():
+    for instance in instances:
+        update_response_time(instance)
 
 
 async def update_status_for_instance(instance: str):
@@ -119,15 +170,6 @@ async def update_status_for_instance(instance: str):
         statuses[instance]['logins'] = int(activity_data['logins'])
         statuses[instance]['registrations'] = int(activity_data['registrations'])
         statuses[instance]['statuses'] = int(activity_data['statuses'])
-
-        # Moving average
-        if statuses[instance]['response_time'] == float('inf'):
-            statuses[instance]['response_time'] = res_health.elapsed.total_seconds()
-        else:
-            statuses[instance]['response_time'] = (
-                statuses[instance]['response_time'] * 0.5
-                + res_health.elapsed.total_seconds() * 0.5
-            )
 
     except httpx.HTTPError:
         statuses[instance]['alive'] = False
@@ -180,12 +222,22 @@ async def index():
     return render_template('index.html', statuses=sorted_statuses)
 
 
-async def worker():
-    await update_status(force=True)
+def worker():
+    def update_statuses():
+        asyncio.run(update_status())
+
+    schedule.every(TTFB_INTERVAL).seconds.do(update_response_times)
+    schedule.every(UPDATE_INTERVAL).seconds.do(update_statuses)
+
+    asyncio.run(update_status(force=True))
+    schedule.run_all()
     while True:
-        await asyncio.sleep(UPDATE_INTERVAL)
-        await update_status()
+        schedule.run_pending()
+        time.sleep(1)
 
 
-asyncio.ensure_future(worker())
+worker_thread = threading.Thread(target=worker)
+worker_thread.setDaemon(True)
+worker_thread.start()
+
 asgi = WsgiToAsgi(app)
