@@ -39,7 +39,7 @@
             <td class="name">
               <span class="title">{{ status['name'] }}</span>
               <br/><a href="https://{{instance}}/">{{ instance }}</a>
-              <span class="invisible" >{{ '%.3f' | format(status['score']) }}</span>
+              <span class="score" >{{ '%.3f' | format(status['score']) }}</span>
             </td>
             {# <td class="software">{{ status['software'] }}</td> #}
             <td class="version">{{ status['version'] }}</td>

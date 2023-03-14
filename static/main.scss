@@ -54,6 +54,13 @@ footer {
       padding: .5em;
     }
 
+    .name {
+      .score {
+        display: block;
+        font-size: .8em;
+      }
+    }
+
     .name .title {
       font-size: 1.2em;
       font-weight: bold;
@@ -139,8 +146,4 @@ footer {
       }
     }
   }
-}
-
-.invisible {
-  display: none;
 }

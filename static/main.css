@@ -11,6 +11,7 @@ footer { flex-grow: 0; box-sizing: border-box; padding: 1rem; }
 .instances .instance.open { background: #79bd9a44; }
 .instances .instance th { margin: .5em; }
 .instances .instance td { padding: .5em; }
+.instances .instance .name .score { display: block; font-size: .8em; }
 .instances .instance .name .title { font-size: 1.2em; font-weight: bold; }
 .instances .instance .version { text-align: left; }
 .instances .instance .time, .instances .instance .statuses, .instances .instance .logins, .instances .instance .registrations { text-align: right; }
@@ -28,4 +29,3 @@ footer { flex-grow: 0; box-sizing: border-box; padding: 1rem; }
   table.instances tr.instance td:nth-of-type(4):before { content: 'Weekly statuses'; }
   table.instances tr.instance td:nth-of-type(5):before { content: 'Weekly logins'; }
   table.instances tr.instance td:nth-of-type(6):before { content: 'Weekly registrations'; } }
-.invisible { display: none; }
