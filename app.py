@@ -194,7 +194,7 @@ def score_function(status):
         + (math.log2(status['logins'] + 1))
         + (math.log2(status['statuses'] + 1))
         + (math.log2(status['registrations'] + 1) * 0.1)
-        - (math.log2(status['response_time']) * 0.5)
+        - (math.log2(status['response_time'] + 0.1) * 0.5)
     )
 
 
