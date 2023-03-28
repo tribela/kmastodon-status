@@ -102,10 +102,13 @@ async def update_status(force=False):
 
     last_updated = datetime.datetime.now()
 
-    await asyncio.gather(*[
-        update_status_for_instance(instance)
-        for instance in instances
-    ])
+    try:
+        await asyncio.gather(*[
+            update_status_for_instance(instance)
+            for instance in instances
+        ])
+    except Exception as e:
+        print(f'Error on updating status: {e}')
 
 
 def update_response_time(instance: str):
