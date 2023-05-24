@@ -235,7 +235,10 @@ def worker():
     asyncio.run(update_status(force=True))
     schedule.run_all()
     while True:
-        schedule.run_pending()
+        try:
+            schedule.run_pending()
+        except Exception as e:
+            print(f'Error on running schedule: {e}')
         time.sleep(1)
 
 
