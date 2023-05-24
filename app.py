@@ -55,6 +55,7 @@ statuses = {
         'open_registrations': False,
         'approval_required': False,
         'score': 0,
+        'last_update': None,
     }
     for instance in instances
 }
@@ -94,14 +95,7 @@ def get_response_time(url: str) -> float:
         return end_time - start_time
 
 
-async def update_status(force=False):
-    global last_updated
-    elapsed = (datetime.datetime.now() - last_updated).total_seconds()
-    if elapsed < UPDATE_INTERVAL and force is False:
-        return
-
-    last_updated = datetime.datetime.now()
-
+async def update_status():
     try:
         await asyncio.gather(*[
             update_status_for_instance(instance)
@@ -109,6 +103,9 @@ async def update_status(force=False):
         ])
     except Exception as e:
         print(f'Error on updating status: {e}')
+
+    global last_updated
+    last_updated = datetime.datetime.now()
 
 
 def update_response_time(instance: str):
@@ -131,6 +128,10 @@ def update_response_time(instance: str):
         statuses[instance]['alive'] = True
     finally:
         statuses[instance]['score'] = score_function(statuses[instance])
+        statuses[instance]['last_update'] = datetime.datetime.now()
+
+    global last_updated
+    last_updated = datetime.datetime.now()
 
 
 def update_response_times():
@@ -222,7 +223,11 @@ async def index():
         statuses.items(),
         key=sort_function,
         reverse=True)
-    return render_template('index.html', statuses=sorted_statuses)
+    return render_template(
+        'index.html',
+        statuses=sorted_statuses,
+        last_updated=last_updated,
+    )
 
 
 def worker():
@@ -232,7 +237,7 @@ def worker():
     schedule.every(TTFB_INTERVAL).seconds.do(update_response_times)
     schedule.every(UPDATE_INTERVAL).seconds.do(update_statuses)
 
-    asyncio.run(update_status(force=True))
+    asyncio.run(update_status())
     schedule.run_all()
     while True:
         try:

@@ -40,6 +40,7 @@
               <span class="title">{{ status['name'] }}</span>
               <br/><a href="https://{{instance}}/">{{ instance }}</a>
               <span class="score" >{{ '%.3f' | format(status['score']) }}</span>
+              <span class="hidden">{{ status['last_update'] }}</span>
             </td>
             {# <td class="software">{{ status['software'] }}</td> #}
             <td class="version">{{ status['version'] }}</td>
@@ -66,6 +67,7 @@
         {% endfor %}
         </tbody>
       </table>
+      <p> Last updated on {{ last_updated }} </p>
     </main>
     <footer>
       <p>&#x1f916;</p>
